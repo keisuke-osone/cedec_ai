@@ -51,6 +51,7 @@ for t in range(totalTurns):
 		# ここでロジック
 		# 自分のプレイヤーナンバーは?
 		# 期待値計算したい マイナスとプラス
+		# 最も期待値が高いところに
 		# command.append(str(random.randrange(numHeroines)))
 		
 		# ここでヒロインのIDを指定して出力
