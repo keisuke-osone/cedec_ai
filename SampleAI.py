@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import sys
 import random
 
@@ -6,6 +8,9 @@ class Heroine:
 		self.enthusiasm = enthusiasm
 		self.revealedLove = []
 		self.myRealLove = 0
+
+		# 最初に熱狂度順にソート
+		# sortedEnthusiasm = sorted(self.enthusiasm)
 
 def readLine():
 	return list(map(int, raw_input().split()))
@@ -20,13 +25,17 @@ for i in range(numHeroines):
 	heroines.append(Heroine(enthusiasm[i]))
 
 for t in range(totalTurns):
+	# ターン数と平日、休日の入力
 	turn, day = raw_input().split()
+	# ターンをintに変換
 	turn = int(turn)
 
+	# プレイヤーごとの好感度の配列
 	for i in range(numHeroines):
 		heroines[i].revealedLove = readLine()
 	
 	realLove = readLine()
+	# 自分への好感度の配列
 	for i in range(numHeroines):
 		heroines[i].myRealLove = realLove[i]
 	
@@ -37,7 +46,13 @@ for t in range(totalTurns):
 
 	command = []
 	for i in range({'W': 5, 'H': 2}[day]):
-		command.append(str(random.randrange(numHeroines)))
+		# ここでロジック
+		# 期待値計算したい
+		# command.append(str(random.randrange(numHeroines)))
+		
+		# ここでヒロインのIDを指定して出力
+		heroineNum = (turn - 1) % 8
+		command.append(str(heroineNum))
 
 	print(' '.join(command))
 	sys.stdout.flush()
