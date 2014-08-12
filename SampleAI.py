@@ -21,6 +21,7 @@ sys.stdout.flush()
 totalTurns, numPlayers, numHeroines = readLine()
 enthusiasm = readLine()
 heroines = []
+cnt = 0
 for i in range(numHeroines):
 	heroines.append(Heroine(enthusiasm[i]))
 
@@ -35,6 +36,7 @@ for t in range(totalTurns):
 		heroines[i].revealedLove = readLine()
 	
 	realLove = readLine()
+	
 	# 自分への好感度の配列
 	for i in range(numHeroines):
 		heroines[i].myRealLove = realLove[i]
@@ -47,12 +49,15 @@ for t in range(totalTurns):
 	command = []
 	for i in range({'W': 5, 'H': 2}[day]):
 		# ここでロジック
-		# 期待値計算したい
+		# 自分のプレイヤーナンバーは?
+		# 期待値計算したい マイナスとプラス
 		# command.append(str(random.randrange(numHeroines)))
 		
 		# ここでヒロインのIDを指定して出力
-		heroineNum = (turn - 1) % 8
+		heroineNum = cnt % 8
+		cnt = cnt + 1
 		command.append(str(heroineNum))
+		
 
 	print(' '.join(command))
 	sys.stdout.flush()
