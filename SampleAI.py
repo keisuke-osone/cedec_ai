@@ -97,15 +97,19 @@ for t in range(totalTurns):
     if (turn > 0):
         tmpArray = heroines
         for var in range(0, length):
-            vote = 0
+            vote = -100
             maxVal = -10000
-            for i in range(0, numHeroines):
+            for k in range(0, numHeroines):
                 # 期待値を計算
-                estimateArray[i] = getEstimation(tmpArray, numHeroines, enthusiasm, point, i)
+                estimateArray[k] = getEstimation(tmpArray, numHeroines, enthusiasm, point, k)
                 # print estimateArray[i]
-                if estimateArray[i] > maxVal:
-                    maxVal = estimateArray[i]
-                    vote = i
+                if estimateArray[k] > maxVal:
+                    maxVal = estimateArray[k]
+                    vote = k
+
+            # 動きがないときはランダムで決める
+            if min(estimateArray) == max(estimateArray):
+                vote = random.randrange(numHeroines)
 
             output.append(vote)
             tmpArray[vote].myRealLove += point
