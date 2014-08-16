@@ -46,6 +46,8 @@ def getEstimation(_heroines, _numHeroines, enthusiasm, point, num):
 print('READY')
 sys.stdout.flush()
 
+stepNUm = 1
+
 totalTurns, numPlayers, numHeroines = readLine()
 enthusiasm = readLine()
 heroines = []
@@ -94,47 +96,32 @@ for t in range(totalTurns):
         point = 2
 
     
-    if (turn > 0):
-        tmpArray = heroines
-        for var in range(0, length):
-            vote = -100
-            maxVal = -10000
-            for k in range(0, numHeroines):
-                # 期待値を計算
-                estimateArray[k] = getEstimation(tmpArray, numHeroines, enthusiasm, point, k)
-                # print estimateArray[i]
-                if estimateArray[k] > maxVal:
-                    maxVal = estimateArray[k]
-                    vote = k
+    # 
+    if (stepNUm == 1)
+	    if (turn > 0):
+	        tmpArray = heroines
+	        for var in range(0, length):
+	            # 投票する番号
+	            vote = -100
+	            # 期待値がマイナスの可能性もあるので
+	            maxVal = -10000
+	            for k in range(0, numHeroines):
+	                # 期待値を計算
+	                estimateArray[k] = getEstimation(tmpArray, numHeroines, enthusiasm, point, k)
+	                # print estimateArray[i]
+	                if estimateArray[k] > maxVal:
+	                    maxVal = estimateArray[k]
+	                    vote = k
 
-            # 動きがないときはランダムで決める
-            if min(estimateArray) == max(estimateArray):
-                vote = random.randrange(numHeroines)
+	            # 動きがないときはランダムで決める
+	            if min(estimateArray) == max(estimateArray):
+	                vote = random.randrange(numHeroines)
 
-            output.append(vote)
-            tmpArray[vote].myRealLove += point
-            tmpArray[vote].revealedLove[0] += point
+	            output.append(vote)
+	            tmpArray[vote].myRealLove += point
+	            tmpArray[vote].revealedLove[0] += point
 
-    # # while len(output) <= length:
-    # for var in range(0, length):
-    #   for i in range(numHeroines):
-    #       # 最下位のとき
-    #       if min(heroines[i].revealedLove) >= heroines[i].myRealLove:
-    #           output.append(i)
-    #       # 自分が一位のとき
-    #       elif max(heroines[i].revealedLove) <= heroines[i].myRealLove:
-    #           # 追いつかれそうなときは追加したい
-    #           pass
-    #       # それ以外
-    #       else:
-    #           maxpoint = int(heroines[i].myRealLove) + ((length - len(output)) * point);
-    #           # 追いつきそうなら振り込む
-    #           if max(heroines[i].revealedLove) <= maxpoint:
-    #               while len(output) <= length:
-    #                   output.append(i)
-    #           else:
-    #               pass
-
+    
     # 配列の長さが足りない場合は適当に足す
     while len(output) <= length:
         output.append(random.randrange(numHeroines))
