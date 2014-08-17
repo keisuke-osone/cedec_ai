@@ -53,6 +53,77 @@ def getEstimation(_heroines, _numHeroines, enthusiasm, point, num):
     # print estimation
     return estimation
 
+#  休日を考慮
+def getEstimationWithHolidayDate(_heroines, _numHeroines, dated, enthusiasm, point, num):
+    estimation = 0
+    estimationWithHolidayDate = 0
+    
+    # print u"振込" + str(num)
+    # print u"振込" + str(point)
+    for j in range(0, _numHeroines):
+        # print u"ヒロイン:" + str(j)
+
+        value = 0
+        if j == num:
+            value = int(_heroines[j].myRealLove) + point
+        else:
+            value = int(_heroines[j].myRealLove)
+        
+        # 休日考慮なし
+        # 最下位のとき
+        # print value
+        # print min(_heroines[j].revealedLove)
+        # print max(_heroines[j].revealedLove)
+        if min(_heroines[j].revealedLove) >= value:
+            minNum = _heroines[j].revealedLove.count(value)
+            if minNum > 1:
+                estimation = float(estimation + (-1 * enthusiasm[j])) / minNum
+            else: 
+                estimation = float(estimation + (-1 * enthusiasm[j]))
+            # print u"最下位" + float(estimation + (-1 * enthusiasm[j]))
+        # 自分が一位のとき
+        elif max(_heroines[j].revealedLove) <= value:
+            maxNum = _heroines[j].revealedLove.count(value)
+            # 追いつかれそうなときは追加したい
+            if maxNum > 1:
+                estimation = float(estimation + enthusiasm[j]) / maxNum
+            else:
+                estimation = float(estimation + enthusiasm[j])
+        # それ以外
+        else:
+            pass
+
+        # 休日考慮あり
+        # 最下位のとき
+        # print float(min(_heroines[j].revealedLove) + dated[j])
+        # print float(max(_heroines[j].revealedLove) + dated[j])
+        # estimationWithHolidayDate = 0.0
+        if float(min(_heroines[j].revealedLove)) + dated[j] >= value:
+            minNum = _heroines[j].revealedLove.count(value)
+            if minNum > 1:
+                estimationWithHolidayDate += float((-1 * enthusiasm[j])) / minNum
+            else: 
+                estimationWithHolidayDate += float((-1 * enthusiasm[j]))
+            # print u"最下位" + str(-1 * enthusiasm[j])
+        # 自分が一位のとき
+        elif float(max(_heroines[j].revealedLove)) + dated[j] <= value:
+            maxNum = _heroines[j].revealedLove.count(value)
+            # 追いつかれそうなときは追加したい
+            if maxNum > 1:
+                estimationWithHolidayDate += float(enthusiasm[j]) / maxNum
+            else:
+                estimationWithHolidayDate += float(enthusiasm[j])
+            # print u"首位" + str(enthusiasm[j])
+        # それ以外
+        else:
+            pass
+            # estimation += 0
+        # print u"累積" + str(estimationWithHolidayDate)
+    # print u"休日なし" + str(estimation)
+    # print u"休日あり" + str(estimationWithHolidayDate)
+
+    return estimationWithHolidayDate
+
     
 
 print('READY')
@@ -64,14 +135,19 @@ totalTurns, numPlayers, numHeroines = readLine()
 enthusiasm = readLine()
 heroines = []
 cnt = 0
+datedEstimation = [0] * numHeroines
+
 for i in range(numHeroines):
     heroines.append(Heroine(enthusiasm[i]))
 
 for t in range(totalTurns):
+
     # ターン数と平日、休日の入力
     turn, day = raw_input().split()
     # ターンをintに変換
     turn = int(turn)
+    # 出力
+    output = []
 
     # プレイヤーごとの好感度の配列
     for i in range(numHeroines):
@@ -87,6 +163,24 @@ for t in range(totalTurns):
         dated = readLine()
     else:
         dated = [0] * numHeroines
+
+    # デートの配列の配列
+    otherDated = copy.deepcopy(dated)
+    for i in range(0, len(datedEstimation)):
+        if len(output) == 2:
+            for j in range(0, len(output)):
+                if otherDated[output[j]] == 1:
+                    if otherDated.count(max(otherDated)) == numPlayers * 2:
+                        otherDated[output[j]] == 0.0
+                    else:
+                        otherDated[output[j]] == 0.5
+
+        datedEstimation[i] += float(otherDated[i] * numPlayers * 2) / otherDated.count(max(otherDated))
+
+    # print "1の数"
+    # print dated.count(max(dated))
+    # print "期待値"
+    # print float(numPlayers * 2) / dated.count(max(dated))
 
     command = []
     
@@ -110,58 +204,54 @@ for t in range(totalTurns):
     outputArray = []
     outputEstimationArray = []
 
-    if stepNum == 1:
-        pass
-    # パターンを分ける 全部同じのに振る、4つ振る
-    else:
-        estimationMax = []
-        voteArray = []
-        # フリの回数
-        # num = length
-        for cnt in range(0, length):
-            # print cnt
-            num = length - cnt
-            # print num
-            # 紐づいた振り込みかた
-            maxEstimation = -100000
+    estimationMax = []
+    voteArray = []
+    # フリの回数
+    # num = length
+    for cnt2 in range(0, length):
+        # print cnt
+        num = length - cnt2
+        # print num
+        # 紐づいた振り込みかた
+        maxEstimation = -100000
 
-            tmpArray = []
-            tmpArray = copy.deepcopy(heroines)
-            # 投票する番号
-            vote = -100
-            # 期待値がマイナスの可能性もあるので
-            maxVal = -10000
-            for k in range(0, numHeroines):
-                # 期待値を計算 振り込む数をポイントにかけて期待値計算
-                estimateArray[k] = getEstimation(tmpArray, numHeroines, enthusiasm, point * num, k)
-                # print estimateArray[k]
-                # print k
+        tmpArray = []
+        tmpArray = copy.deepcopy(heroines)
+        # 投票する番号
+        vote = -100
+        # 期待値がマイナスの可能性もあるので
+        maxVal = -10000
+        for k in range(0, numHeroines):
+            # 期待値を計算 振り込む数をポイントにかけて期待値計算
+            # estimateArray[k] = getEstimation(tmpArray, numHeroines, enthusiasm, point * num, k)
+            estimateArray[k] = getEstimationWithHolidayDate(tmpArray, numHeroines, datedEstimation, enthusiasm, point * num, k)
+            # print estimateArray[k]
+            # print k
 
-                if estimateArray[k] >= maxVal:
-                    maxVal = estimateArray[k]
-                    vote = k
+            if estimateArray[k] > maxVal:
+                maxVal = estimateArray[k]
+                vote = k
 
-            # print maxVal
-            # print vote
-            estimationMax.append(maxVal)
-            voteArray.append(vote)
+        # print maxVal
+        # print vote
+        estimationMax.append(maxVal)
+        voteArray.append(vote)
 
-            estMax = -100000
-            finalVote = -100
-            for estNum in range(0,len(estimationMax)):
-                # print estimationMax[estNum]
-                if estimationMax[estNum] > estMax:
-                    maxVal = estimationMax[estNum]
-                    finalVote = voteArray[estNum]
+        estMax = -100000
+        finalVote = -100
+        for estNum in range(0,len(estimationMax)):
+            # print estimationMax[estNum]
+            if estimationMax[estNum] > estMax:
+                maxVal = estimationMax[estNum]
+                finalVote = voteArray[estNum]
 
-            output = []
-            output = [finalVote] * num
-            # print output
-            for input in range(0, len(output)):
-                tmpArray[output[input]].myRealLove += point
+        output = [finalVote] * num
+        # print output
+        for input in range(0, len(output)):
+            tmpArray[output[input]].myRealLove += point
 
-            length1 = copy.deepcopy(cnt)
-            # for cnt1 in range(0, length1):
+        length1 = length - len(output)
+        for cnt1 in range(0, length1):
             # 紐づいた振り込みかた
             maxEstimation = -100000
 
@@ -174,7 +264,8 @@ for t in range(totalTurns):
             maxVal = -10000
             for k in range(0, numHeroines):
                 # 期待値を計算 振り込む数をポイントにかけて期待値計算
-                estimateArray[k] = getEstimation(tmpArray, numHeroines, enthusiasm, point * length1, k)
+                # estimateArray[k] = getEstimation(tmpArray, numHeroines, enthusiasm, point * length1, k)
+                estimateArray[k] = getEstimationWithHolidayDate(tmpArray, numHeroines, datedEstimation, enthusiasm, point * length1, k)
 
                 if estimateArray[k] > maxVal:
                     maxVal = estimateArray[k]
@@ -183,33 +274,33 @@ for t in range(totalTurns):
             estimationMax.append(maxVal)
             voteArray.append(vote)
 
-            estMax = -100000
-            finalVote = -100
-            for estNum in range(0,len(estimationMax)):
-                # print estimationMax[estNum]
-                if estimationMax[estNum] >= estMax:
-                    maxVal = estimationMax[estNum]
-                    finalVote = voteArray[estNum]
-            # print maxVal
-            out2 = [finalVote] * cnt
-            for l in range(0, len(out2)):
-                output.append(out2[l])
+        estMax = -100000
+        finalVote = -100
+        for estNum in range(0,len(estimationMax)):
+            # print estimationMax[estNum]
+            if estimationMax[estNum] >= estMax:
+                estMax = estimationMax[estNum]
+                finalVote = voteArray[estNum]
+        # print maxVal
+        out2 = [finalVote] * cnt2
+        for l in range(0, len(out2)):
+            output.append(out2[l])
 
-            outputEstimationArray.append(maxVal)
-            outputArray.append(output)
+        outputEstimationArray.append(estMax)
+        outputArray.append(output)
 
-        # 戦略の決定
-        # print outputArray
-        # print outputEstimationArray
+    # 戦略の決定
+    # print outputArray
+    # print outputEstimationArray
 
-        finalOutput = []
-        maxOutputEstimation = -100000
-        for m in range(0, len(outputEstimationArray)):
-            if outputEstimationArray[m] > maxOutputEstimation:
-                maxOutputEstimation = outputEstimationArray[m]
-                finalOutput = outputArray[m]
+    finalOutput = []
+    maxOutputEstimation = -100000
+    for m in range(0, len(outputEstimationArray)):
+        if outputEstimationArray[m] > maxOutputEstimation:
+            maxOutputEstimation = outputEstimationArray[m]
+            finalOutput = outputArray[m]
 
-        output = finalOutput
+    output = finalOutput
     
     # 配列の長さが足りない場合は適当に足す
     while len(output) <= length:
@@ -226,7 +317,10 @@ for t in range(totalTurns):
         # heroineNum = cnt % 8
         # cnt = cnt + 1
         # print output
-        command.append(str(output[i]))
+        if (turn > 1):
+            command.append(str(output[i]))
+        else:
+            command.append(str(random.randrange(numHeroines)))
         
 
     print(' '.join(command))
