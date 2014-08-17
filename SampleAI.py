@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import copy
 import sys
 import random
 
@@ -77,8 +78,7 @@ for t in range(totalTurns):
         dated = [0] * numHeroines
 
     command = []
-    output = []
-
+    
     out = heroines[0].revealedLove
     out.append(3)
     
@@ -96,7 +96,9 @@ for t in range(totalTurns):
         point = 2
 
     
-    # 
+    outputArray = []
+    outputEstimationArray = []
+
     if stepNum == 1:
         pass
     # パターンを分ける 全部同じのに振る、4つ振る
@@ -104,43 +106,99 @@ for t in range(totalTurns):
         estimationMax = []
         voteArray = []
         # フリの回数
-        num = length
-        # for cnt in range(0, 1):
-        # num = num - cnt
-        # 紐づいた振り込みかた
-        maxEstimation = -100000
+        # num = length
+        for cnt in range(0, length):
+            # print cnt
+            num = length - cnt
+            # print num
+            # 紐づいた振り込みかた
+            maxEstimation = -100000
 
-        # if (turn > 0):
-        tmpArray = heroines
-        # for var in range(1, length):
-        # 投票する番号
-        vote = -100
-        # 期待値がマイナスの可能性もあるので
-        maxVal = -10000
-        for k in range(0, numHeroines):
-            # 期待値を計算 振り込む数をポイントにかけて期待値計算
-            estimateArray[k] = getEstimation(tmpArray, numHeroines, enthusiasm, point * num, k)
-            # print estimateArray[k]
-            # print k
+            tmpArray = []
+            tmpArray = copy.deepcopy(heroines)
+            # 投票する番号
+            vote = -100
+            # 期待値がマイナスの可能性もあるので
+            maxVal = -10000
+            for k in range(0, numHeroines):
+                # 期待値を計算 振り込む数をポイントにかけて期待値計算
+                estimateArray[k] = getEstimation(tmpArray, numHeroines, enthusiasm, point * num, k)
+                # print estimateArray[k]
+                # print k
 
-            if estimateArray[k] > maxVal:
-                maxVal = estimateArray[k]
-                vote = k
+                if estimateArray[k] >= maxVal:
+                    maxVal = estimateArray[k]
+                    vote = k
 
-        # print maxVal
-        # print vote
-        estimationMax.append(maxVal)
-        voteArray.append(vote)
+            # print maxVal
+            # print vote
+            estimationMax.append(maxVal)
+            voteArray.append(vote)
 
-        estMax = -100000
-        finalVote = -100
-        for estNum in range(0,len(estimationMax)):
-            # print estimationMax[estNum]
-            if estimationMax[estNum] > estMax:
-                maxVal = estimationMax[estNum]
-                finalVote = voteArray[estNum]
+            estMax = -100000
+            finalVote = -100
+            for estNum in range(0,len(estimationMax)):
+                # print estimationMax[estNum]
+                if estimationMax[estNum] > estMax:
+                    maxVal = estimationMax[estNum]
+                    finalVote = voteArray[estNum]
 
-        output = [finalVote] * length
+            output = []
+            output = [finalVote] * num
+            # print output
+            for input in range(0, len(output)):
+                tmpArray[output[input]].myRealLove += point
+
+            length1 = copy.deepcopy(cnt)
+            # for cnt1 in range(0, length1):
+            # 紐づいた振り込みかた
+            maxEstimation = -100000
+
+            # if (turn > 0):
+            # tmpArray = heroines
+            # for var in range(1, length):
+            # 投票する番号
+            vote = -100
+            # 期待値がマイナスの可能性もあるので
+            maxVal = -10000
+            for k in range(0, numHeroines):
+                # 期待値を計算 振り込む数をポイントにかけて期待値計算
+                estimateArray[k] = getEstimation(tmpArray, numHeroines, enthusiasm, point * length1, k)
+
+                if estimateArray[k] > maxVal:
+                    maxVal = estimateArray[k]
+                    vote = k
+
+            estimationMax.append(maxVal)
+            voteArray.append(vote)
+
+            estMax = -100000
+            finalVote = -100
+            for estNum in range(0,len(estimationMax)):
+                # print estimationMax[estNum]
+                if estimationMax[estNum] >= estMax:
+                    maxVal = estimationMax[estNum]
+                    finalVote = voteArray[estNum]
+            # print maxVal
+            out2 = [finalVote] * cnt
+            for l in range(0, len(out2)):
+                output.append(out2[l])
+
+            outputEstimationArray.append(maxVal)
+            outputArray.append(output)
+
+        # 戦略の決定
+        # print outputArray
+        # print outputEstimationArray
+
+        finalOutput = []
+        maxOutputEstimation = -100000
+        for m in range(0, len(outputEstimationArray)):
+            if outputEstimationArray[m] > maxOutputEstimation:
+                maxOutputEstimation = outputEstimationArray[m]
+                finalOutput = outputArray[m]
+
+        output = finalOutput
     
     # 配列の長さが足りない場合は適当に足す
     while len(output) <= length:
@@ -154,8 +212,9 @@ for t in range(totalTurns):
         # command.append(str(random.randrange(numHeroines)))
         
         # ここでヒロインのIDを指定して出力
-        heroineNum = cnt % 8
-        cnt = cnt + 1
+        # heroineNum = cnt % 8
+        # cnt = cnt + 1
+        # print output
         command.append(str(output[i]))
         
 
