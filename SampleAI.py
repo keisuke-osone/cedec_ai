@@ -22,6 +22,8 @@ def getEstimation(_heroines, _numHeroines, enthusiasm, point, num):
     # print(enthusiasm)
     # print(point)
     # print(num)
+    # revealedLoveArray = [0] * 
+
     for j in range(0, _numHeroines):
         value = 0
         if j == num:
@@ -31,15 +33,24 @@ def getEstimation(_heroines, _numHeroines, enthusiasm, point, num):
         
         # 最下位のとき
         if min(_heroines[j].revealedLove) >= value:
-            estimation = estimation + (-1 * enthusiasm[j])
+            minNum = _heroines[j].revealedLove.count(value)
+            if minNum > 1:
+                estimation = (estimation + (-1 * enthusiasm[j])) / minNum
+            else: 
+                estimation = (estimation + (-1 * enthusiasm[j]))
         # 自分が一位のとき
         elif max(_heroines[j].revealedLove) <= value:
+            maxNum = _heroines[j].revealedLove.count(value)
             # 追いつかれそうなときは追加したい
-            estimation = estimation + enthusiasm[j]
+            if maxNum > 1:
+                estimation = (estimation + enthusiasm[j]) / maxNum
+            else:
+                estimation = (estimation + enthusiasm[j])
         # それ以外
         else:
             pass
             # estimation += 0
+    # print estimation
     return estimation
 
     
