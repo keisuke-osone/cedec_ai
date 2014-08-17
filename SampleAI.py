@@ -46,7 +46,7 @@ def getEstimation(_heroines, _numHeroines, enthusiasm, point, num):
 print('READY')
 sys.stdout.flush()
 
-stepNUm = 1
+stepNum = 2
 
 totalTurns, numPlayers, numHeroines = readLine()
 enthusiasm = readLine()
@@ -97,35 +97,54 @@ for t in range(totalTurns):
 
     
     # 
-    if (stepNUm == 1)
-	    if (turn > 0):
-	        tmpArray = heroines
-	        for var in range(0, length):
-	            # 投票する番号
-	            vote = -100
-	            # 期待値がマイナスの可能性もあるので
-	            maxVal = -10000
-	            for k in range(0, numHeroines):
-	                # 期待値を計算
-	                estimateArray[k] = getEstimation(tmpArray, numHeroines, enthusiasm, point, k)
-	                # print estimateArray[i]
-	                if estimateArray[k] > maxVal:
-	                    maxVal = estimateArray[k]
-	                    vote = k
+    if stepNum == 1:
+        pass
+    # パターンを分ける 全部同じのに振る、4つ振る
+    else:
+        estimationMax = []
+        voteArray = []
+        # フリの回数
+        num = length
+        # for cnt in range(0, 1):
+        # num = num - cnt
+        # 紐づいた振り込みかた
+        maxEstimation = -100000
 
-	            # 動きがないときはランダムで決める
-	            if min(estimateArray) == max(estimateArray):
-	                vote = random.randrange(numHeroines)
+        # if (turn > 0):
+        tmpArray = heroines
+        # for var in range(1, length):
+        # 投票する番号
+        vote = -100
+        # 期待値がマイナスの可能性もあるので
+        maxVal = -10000
+        for k in range(0, numHeroines):
+            # 期待値を計算 振り込む数をポイントにかけて期待値計算
+            estimateArray[k] = getEstimation(tmpArray, numHeroines, enthusiasm, point * num, k)
+            # print estimateArray[k]
+            # print k
 
-	            output.append(vote)
-	            tmpArray[vote].myRealLove += point
-	            tmpArray[vote].revealedLove[0] += point
+            if estimateArray[k] > maxVal:
+                maxVal = estimateArray[k]
+                vote = k
 
+        # print maxVal
+        # print vote
+        estimationMax.append(maxVal)
+        voteArray.append(vote)
+
+        estMax = -100000
+        finalVote = -100
+        for estNum in range(0,len(estimationMax)):
+            # print estimationMax[estNum]
+            if estimationMax[estNum] > estMax:
+                maxVal = estimationMax[estNum]
+                finalVote = voteArray[estNum]
+
+        output = [finalVote] * length
     
     # 配列の長さが足りない場合は適当に足す
     while len(output) <= length:
         output.append(random.randrange(numHeroines))
-
 
     for i in range({'W': 5, 'H': 2}[day]):
         # ここでロジック
